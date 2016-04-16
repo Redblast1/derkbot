@@ -9,13 +9,17 @@ def handle(msg):
 	if content_type == 'text': #checks if it is a text message and not a picture
 		command = msg['text'] #saves the text in the message
 		sender = msg['from']['first_name'] #saves the first name of the sender	
-		global commandPrevious
 
 		if command[0] == '/':
 			print ('Got command: %s' % command) #prints to terminal what it is looking at
 			
-			if command == '//' or command == '//@DerkBot': #Checks to see if the command entered is '//', if it is, then set command to the last used command			
-				command = commandPrevious			
+			if command != '//' : #Checks if the command entered is not // or //@Derkbot, if this is the case, saves it to file
+				with open('lastCommand.txt', 'w') as f:
+					f.write(command)
+
+			if command == '//' or command == '//@DerkBot': #Checks to see if the command entered is '//', if it is, then set command to the last command from file			
+				with open('lastCommand.txt', 'r+') as f:
+					command = f.readline()			
 				
 			#Start checking the command for one of the following:
 			if command == '/howdy' or command == '/howdy@DerkBot':
@@ -30,7 +34,6 @@ def handle(msg):
 				bot.sendMessage(chat_id, 'Derek, you just... uh, toasted!')
 			elif command == '/records' or command == '/records@Derkbot':
 				bot.sendMessage(chat_id, 'The total of complete and utter roastings on Derek: ' + str(recordList[0]) + '\nThe total number of times Derek left abruptly: ' + str(recordList[1]))
-			commandPrevious = command #After checking all the commands for text messages, set the last command to the current command, so that the check in the beginning is correct
 
 #--------------------------------------------------------------------
 
@@ -49,9 +52,7 @@ def updateRecord(kind, num):
 
 #--------------------------------------------------------------------
 
-#Other Global Variables
-commandPrevious = '/howdy' #This variable is so the commandPrevious has a default command incase you use the repeat command '//' on start up.
-
+#Opens token and assigns it
 tkn = open('token.txt', 'r')
 TOKEN = tkn.read(45)  #Assigns TOKEN with token from outside the file, which is git ignored 
 tkn.close()
